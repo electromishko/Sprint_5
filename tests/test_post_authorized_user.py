@@ -8,19 +8,7 @@ faker = Faker()
 
 class TestPostUIAuthorizedUser:
 
-    def test_authorized_user_can_create_ad(self, driver, create_user):
-        driver.get(data.web_link)
-        driver.find_element(*AuthorizationLocators.LOGIN_BUTTON).click()
-        WebDriverWait(driver, 10).until(expected_conditions.visibility_of_element_located(
-            AuthorizationLocators.EMAIL_FIELD))
-        
-        driver.find_element(*AuthorizationLocators.EMAIL_FIELD).send_keys(create_user[0])
-        driver.find_element(*AuthorizationLocators.PASSWORD_FIELD).send_keys(create_user[1])
-        driver.find_element(*AuthorizationLocators.MAIN_LOGIN_BUTTON).click()
-
-        WebDriverWait(driver, 10).until(expected_conditions.visibility_of_element_located(
-            AuthorizationLocators.USER_TEXT))
-
+    def test_authorized_user_can_create_ad(self, driver, login_user):
         driver.find_element(*AuthorizationLocators.CREATE_AD_BUTTON).click()
 
         new_name = faker.text(15)
