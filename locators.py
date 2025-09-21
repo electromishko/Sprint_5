@@ -30,3 +30,4 @@ class AuthorizationLocators:
     USER_PROFILE_BUTTON = (By.XPATH, '//button[@class="circleSmall"]')
     MY_ADS_SECTION = (By.CLASS_NAME, "profile_profile__bixlA")
     AD_ITEM = (By.CLASS_NAME, 'picture')
+    INPUT_SEARCH = (By.XPATH, "//input[@placeholder='Я хочу купить...']")

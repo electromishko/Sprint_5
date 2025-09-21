@@ -3,7 +3,6 @@ from selenium.webdriver.support import expected_conditions
 from faker import Faker
 from locators import AuthorizationLocators
 import data
-import time
 
 faker = Faker()
 
@@ -46,7 +45,8 @@ class TestPostUIAuthorizedUser:
             AuthorizationLocators.PUBLISH_BUTTON))
         driver.find_element(*AuthorizationLocators.PUBLISH_BUTTON).click()
 
-        time.sleep(1)
+        WebDriverWait(driver, 10).until(expected_conditions.visibility_of_element_located(
+            AuthorizationLocators.INPUT_SEARCH))
 
         WebDriverWait(driver, 10).until(expected_conditions.visibility_of_element_located(
             AuthorizationLocators.USER_PROFILE_BUTTON))
