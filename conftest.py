@@ -16,23 +16,44 @@ def driver():
     driver.quit()
 
 @pytest.fixture
-def create_user(driver, login=None, password=None):
-    if not login:
-        login = faker.email()
-    if not password:
-        password = faker.password()
-    
+def create_user(driver):
+    def _create_user(login=None, password=None):
+        if not login:
+            login = faker.email()
+        if not password:
+            password = faker.password()
+        
+        driver.get(data.web_link)
+        driver.find_element(*AuthorizationLocators.LOGIN_BUTTON).click()
+        
+        WebDriverWait(driver, 10).until(
+            expected_conditions.visibility_of_element_located(AuthorizationLocators.NO_ACCOUNT_BUTTON)
+        )
+        driver.find_element(*AuthorizationLocators.NO_ACCOUNT_BUTTON).click()
+        driver.find_element(*AuthorizationLocators.EMAIL_FIELD).send_keys(login)
+        driver.find_element(*AuthorizationLocators.PASSWORD_FIELD).send_keys(password)
+        driver.find_element(*AuthorizationLocators.CONFIRM_PASSWORD_FIELD).send_keys(password)
+        driver.find_element(*AuthorizationLocators.CREATE_ACCOUNT_BUTTON).click()
+
+        return [login, password]
+    return _create_user
+
+@pytest.fixture
+def login_user(driver, create_user):
+    user_credentials = create_user()
+
     driver.get(data.web_link)
     driver.find_element(*AuthorizationLocators.LOGIN_BUTTON).click()
-    
-    WebDriverWait(driver, 11).until(
-        expected_conditions.visibility_of_element_located(AuthorizationLocators.NO_ACCOUNT_BUTTON)
+
+    WebDriverWait(driver, 10).until(
+        expected_conditions.visibility_of_element_located(AuthorizationLocators.EMAIL_FIELD))
+
+    driver.find_element(*AuthorizationLocators.EMAIL_FIELD).send_keys(user_credentials[0])
+    driver.find_element(*AuthorizationLocators.PASSWORD_FIELD).send_keys(user_credentials[1])
+    driver.find_element(*AuthorizationLocators.MAIN_LOGIN_BUTTON).click()
+
+    WebDriverWait(driver, 10).until(
+        expected_conditions.visibility_of_element_located(AuthorizationLocators.USER_TEXT)
     )
-    driver.find_element(*AuthorizationLocators.NO_ACCOUNT_BUTTON).click()
-    
-    driver.find_element(*AuthorizationLocators.EMAIL_FIELD).send_keys(login)
-    driver.find_element(*AuthorizationLocators.PASSWORD_FIELD).send_keys(password)
-    driver.find_element(*AuthorizationLocators.CONFIRM_PASSWORD_FIELD).send_keys(password)
-    driver.find_element(*AuthorizationLocators.CREATE_ACCOUNT_BUTTON).click()
-    
-    return [login, password]
+
+    return user_credentials
